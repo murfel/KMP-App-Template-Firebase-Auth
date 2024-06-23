@@ -5,8 +5,12 @@ import com.jetbrains.kmpapp.data.KtorMuseumApi
 import com.jetbrains.kmpapp.data.MuseumApi
 import com.jetbrains.kmpapp.data.MuseumRepository
 import com.jetbrains.kmpapp.data.MuseumStorage
+import com.jetbrains.kmpapp.screens.auth.AuthModel
 import com.jetbrains.kmpapp.screens.detail.DetailScreenModel
 import com.jetbrains.kmpapp.screens.list.ListScreenModel
+import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.auth.FirebaseUser
+import dev.gitlive.firebase.auth.auth
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.http.ContentType
@@ -15,6 +19,11 @@ import kotlinx.serialization.json.Json
 import org.koin.core.context.startKoin
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
+
+val authModule = module {
+    single { Firebase.auth }
+    single<FirebaseUser?> { null }
+}
 
 val dataModule = module {
     single {
@@ -37,6 +46,7 @@ val dataModule = module {
 }
 
 val screenModelsModule = module {
+    factoryOf(::AuthModel)
     factoryOf(::ListScreenModel)
     factoryOf(::DetailScreenModel)
 }
@@ -44,6 +54,7 @@ val screenModelsModule = module {
 fun initKoin() {
     startKoin {
         modules(
+            authModule,
             dataModule,
             screenModelsModule,
         )
